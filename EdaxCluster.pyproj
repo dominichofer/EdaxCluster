@@ -1,0 +1,124 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>bc52e6c1-9c3d-4fd5-982c-d19806c3b433</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>EdaxCluster</Name>
+    <RootNamespace>EdaxCluster</RootNamespace>
+    <TestFramework>unittest</TestFramework>
+    <UnitTestPattern>*_test.py</UnitTestPattern>
+    <UnitTestRootDirectory>.</UnitTestRootDirectory>
+    <IsWindowsApplication>False</IsWindowsApplication>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="core\" />
+    <Folder Include="core\__pycache__\" />
+    <Folder Include="core_tests\" />
+    <Folder Include="core_tests\__pycache__\" />
+    <Folder Include="edax\" />
+    <Folder Include="edax\__pycache__\" />
+    <Folder Include="edax_tests\" />
+    <Folder Include="edax_tests\__pycache__\" />
+    <Folder Include="workspread\" />
+    <Folder Include="workspread\__pycache__\" />
+    <Folder Include="workspread\test\" />
+    <Folder Include="workspread\test\__pycache__\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="core\__pycache__\field.cpython-310.pyc" />
+    <Content Include="core\__pycache__\game.cpython-310.pyc" />
+    <Content Include="core\__pycache__\game_file.cpython-310.pyc" />
+    <Content Include="core\__pycache__\game_score.cpython-310.pyc" />
+    <Content Include="core\__pycache__\game_score_file.cpython-310.pyc" />
+    <Content Include="core\__pycache__\moves.cpython-310.pyc" />
+    <Content Include="core\__pycache__\play.cpython-310.pyc" />
+    <Content Include="core\__pycache__\position.cpython-310.pyc" />
+    <Content Include="core\__pycache__\position_file.cpython-310.pyc" />
+    <Content Include="core\__pycache__\position_score.cpython-310.pyc" />
+    <Content Include="core\__pycache__\position_score_file.cpython-310.pyc" />
+    <Content Include="core\__pycache__\random_engine.cpython-310.pyc" />
+    <Content Include="core\__pycache__\solve_game_score.cpython-310.pyc" />
+    <Content Include="core\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="core_tests\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="edax\__pycache__\engine.cpython-310.pyc" />
+    <Content Include="edax\__pycache__\output.cpython-310.pyc" />
+    <Content Include="edax\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="edax_tests\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\abstract_protocols.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\client.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\job.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\job.cpython-38.pyc" />
+    <Content Include="workspread\__pycache__\message.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\message.cpython-38.pyc" />
+    <Content Include="workspread\__pycache__\protocols.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\server.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\server.cpython-38.pyc" />
+    <Content Include="workspread\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="workspread\__pycache__\__init__.cpython-38.pyc" />
+    <Content Include="workspread\test\__pycache__\test_message.cpython-310.pyc" />
+    <Content Include="workspread\test\__pycache__\__init__.cpython-310.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="core\field.py" />
+    <Compile Include="core\game.py" />
+    <Compile Include="core\game_file.py" />
+    <Compile Include="core\game_score.py" />
+    <Compile Include="core\game_score_file.py" />
+    <Compile Include="core\moves.py" />
+    <Compile Include="core\play.py" />
+    <Compile Include="core\position.py" />
+    <Compile Include="core\position_file.py" />
+    <Compile Include="core\position_score.py" />
+    <Compile Include="core\position_score_file.py" />
+    <Compile Include="core\random_engine.py" />
+    <Compile Include="core\solve_game_score.py" />
+    <Compile Include="core\__init__.py" />
+    <Compile Include="core_tests\field_test.py" />
+    <Compile Include="core_tests\game_score_test.py" />
+    <Compile Include="core_tests\game_test.py" />
+    <Compile Include="core_tests\moves_test.py" />
+    <Compile Include="core_tests\position_score_test.py" />
+    <Compile Include="core_tests\position_test.py" />
+    <Compile Include="core_tests\__init__.py" />
+    <Compile Include="edax\engine.py" />
+    <Compile Include="edax\output.py" />
+    <Compile Include="edax\__init__.py" />
+    <Compile Include="edax_tests\engine_test.py" />
+    <Compile Include="edax_tests\output_test.py" />
+    <Compile Include="edax_tests\__init__.py" />
+    <Compile Include="server.py" />
+    <Compile Include="workspread\abstract_protocols.py" />
+    <Compile Include="workspread\client.py" />
+    <Compile Include="workspread\job.py" />
+    <Compile Include="workspread\message.py" />
+    <Compile Include="workspread\protocols.py" />
+    <Compile Include="workspread\server.py" />
+    <Compile Include="workspread\__init__.py" />
+    <Compile Include="workspread\test\protocols_test.py" />
+    <Compile Include="workspread\test\__init__.py" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

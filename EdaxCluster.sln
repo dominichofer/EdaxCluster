@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "EdaxCluster", "EdaxCluster.pyproj", "{BC52E6C1-9C3D-4FD5-982C-D19806C3B433}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC52E6C1-9C3D-4FD5-982C-D19806C3B433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC52E6C1-9C3D-4FD5-982C-D19806C3B433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {85445AC9-D2E3-4231-B6E5-3D527DF642B4}
+	EndGlobalSection
+EndGlobal
