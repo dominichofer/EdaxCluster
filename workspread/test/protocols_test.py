@@ -1,5 +1,6 @@
 import unittest
-from workspread.protocols import HeaderPresentation
+from random import randbytes
+from workspread.protocols import HeaderPresentation, HeaderSizeTransport
 
 
 class HeaderPresentationTest(unittest.TestCase):
@@ -39,6 +40,40 @@ class HeaderPresentationTest(unittest.TestCase):
         data = HeaderPresentation.encode(original)
         msg = HeaderPresentation.decode(data)
         self.assertEqual(original, msg)
+
+
+class SocketMock:
+
+    def sendall(self, data: bytes) -> None:
+        self.stream = data
+
+    def recv(self, buffer_size: int) -> bytes:
+        data = self.stream[:buffer_size]
+        self.stream = self.stream[buffer_size:]
+        return data
+
+
+class HeaderSizeTransportTest(unittest.TestCase):
+
+    def test_send_receive_1_chunk(self):
+        original = b'\x12\x34\x56\x78'
+        socket = SocketMock()
+        tp = HeaderSizeTransport(socket)
+
+        tp.send(original)
+        recv = tp.receive()
+
+        self.assertEqual(original, recv)
+
+    def test_send_receive_multichunk(self):
+        original = randbytes(int(12.5 * HeaderSizeTransport.buffer_size))
+        socket = SocketMock()
+        tp = HeaderSizeTransport(socket)
+
+        tp.send(original)
+        recv = tp.receive()
+
+        self.assertEqual(original, recv)
 
         
 if __name__ == '__main__':

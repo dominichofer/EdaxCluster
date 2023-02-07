@@ -1,12 +1,17 @@
+import datetime
 from typing import Iterable
 from .protocols import *
 
+def log(text: str) -> None:
+    now = datetime.datetime.now()
+    print(f'[{now}] {text}')
 
 class TaskDispatchClient:
 
     def __init__(self, ip) -> None:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind((ip, 12350))
+        sock.connect((ip, 12350))
+        sock.setblocking(True)
         self.tdp = TaskDispatchProtocol(HeaderPresentation, StatefulSession(HeaderSizeTransport), sock)
 
     def request_task(self) -> str:
@@ -16,9 +21,9 @@ class TaskDispatchClient:
         except:
             return None
         
-        if msg.type == TaskDispatchProtocol.Message.Type.respond:
-            return msg.body
-        elif msg.type == TaskDispatchProtocol.Message.Type.deny:
+        if msg.type == Message.Type.respond:
+            return msg.content
+        elif msg.type == Message.Type.deny:
             return None
 
     def report_result(self, result: str) -> None:
@@ -27,7 +32,7 @@ class TaskDispatchClient:
     def report_fail(self) -> None:
         self.tdp.report_fail()
 
-    def run(self, tasks) -> list:
+    def dispatch(self, tasks) -> list:
         if not isinstance(tasks, Iterable):
             tasks = [tasks]
 
@@ -38,7 +43,7 @@ class TaskDispatchClient:
 
         while any(r is None for r in results):
             msg = self.tdp.receive()
-            if msg.type == TaskDispatchProtocol.Message.Type.report:
+            if msg.type == Message.Type.report:
                 i, r = msg.content
                 results[i] = r
             else:

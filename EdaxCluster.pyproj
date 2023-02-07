@@ -101,7 +101,9 @@
     <Compile Include="edax_tests\engine_test.py" />
     <Compile Include="edax_tests\output_test.py" />
     <Compile Include="edax_tests\__init__.py" />
-    <Compile Include="server.py" />
+    <Compile Include="run_sender.py" />
+    <Compile Include="run_server.py" />
+    <Compile Include="run_worker.py" />
     <Compile Include="workspread\abstract_protocols.py" />
     <Compile Include="workspread\client.py" />
     <Compile Include="workspread\job.py" />

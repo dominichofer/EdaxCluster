@@ -15,20 +15,20 @@ class TaskDispatchServer:
     def log(self, text: str) -> None:
         now = datetime.datetime.now()
         Q = len(self.task_queue)
-        print(f'[{now}] [{Q}] {text}')
+        print(f'[{now}] [Queue size: {Q}] {text}')
 
     def service_client(self, tdp: TaskDispatchProtocol):
         try:
             msg = tdp.receive()
             self.log(f'Received {msg.type.name}.')
-            if msg.type == TaskDispatchProtocol.Message.Type.dispatch:
+            if msg.type == Message.Type.dispatch:
                 if isinstance(msg.content, Iterable):
                     self.task_queue.extend(msg.content)
-                    self.dispatcher.extend([tdp] * len(msg.content))
+                    self.origin.extend([tdp] * len(msg.content))
                 else:
                     self.task_queue.append(msg.content)
-                    self.dispatcher.append(tdp)
-            elif msg.type == TaskDispatchProtocol.Message.Type.request:
+                    self.origin.append(tdp)
+            elif msg.type == Message.Type.request:
                 if self.task_queue:
                     task = self.task_queue.pop(0)
                     origin = self.origin.pop(0)
@@ -38,20 +38,22 @@ class TaskDispatchServer:
                 else:
                     tdp.deny()
                     self.log('Sent no task.')
-            elif msg.type == TaskDispatchProtocol.Message.Type.report:
+            elif msg.type == Message.Type.report:
                 task, origin = tdp.session.data
                 tdp.session.data = None
                 origin.report(msg.content)
                 self.log('Forwarded task.')
-            elif msg.type == TaskDispatchProtocol.Message.Type.report_fail:
+            elif msg.type == Message.Type.report_fail:
                 task, origin = tdp.session.data
                 self.task_queue.insert(0, msg.content)
-                self.dispatcher.insert(0, tdp)
+                self.origin.insert(0, tdp)
                 self.log('Re-enlisted task.')
-        except:
-            task, origin = tdp.session.data
-            self.task_queue.insert(0, msg.content)
-            self.dispatcher.insert(0, tdp)
+            self.log(f'Processed {msg.type.name}.')
+        except Exception as e:
+            if tdp.session.data is not None:
+                task, origin = tdp.session.data
+                self.task_queue.insert(0, task)
+                self.origin.insert(0, origin)
             self._conn.unregister(tdp.session.sock)
             self.log('Connection lost.')
         

@@ -1,28 +1,45 @@
 from .abstract_protocols import *
 from enum import Enum
+    
+
+class Message:
+
+    class Type(Enum):
+        dispatch = 0
+        request = 1
+        respond = 2
+        deny = 3
+        report = 4
+        report_fail = 5
+
+    def __init__(self, type: Type, content = None) -> None:
+        self.type = type
+        self.content = content
 
 
 class HeaderSizeTransport(TransportProtocol):
+
+    buffer_size = 2048
 
     def __init__(self, sock) -> None:
         self.sock = sock
 
     def send(self, data: bytes) -> None:
-        header = len(data).to_bytes(4, 'big')
+        header = len(data).to_bytes(8, 'big')
         self.sock.sendall(header + data)
 
     def receive(self) -> bytes:
-        chunk = self.sock.recv(2048)
+        chunk = self.sock.recv(self.buffer_size)
 
-        header = chunk[0:4]
+        header = chunk[0:8]
         body_size = int.from_bytes(header, 'big')
 
-        body = bytearray(chunk[4:])
+        body = bytearray(chunk[8:])
         while len(body) < body_size:
-            chunk = self.sock.recv(min(body_size - len(body), 2048))
+            chunk = self.sock.recv(min(body_size - len(body), self.buffer_size))
             if chunk == b'':
                 raise RuntimeError('Sock connection broken')
-            body.append(chunk)
+            body += chunk
         return body
 
     
@@ -74,7 +91,9 @@ class HeaderPresentation(PresentationProtocol):
                 data += HeaderPresentation.encode(len(encoded_element))
                 data += encoded_element
             return data
-        raise RuntimeError('Unknown message type')
+        if isinstance(msg, Message.Type):
+            return b'\x06' + msg.value.to_bytes(8, 'big')
+        raise RuntimeError(f'Failed to encode {msg}')
 
     @staticmethod
     def decode(data: bytes):
@@ -110,23 +129,9 @@ class HeaderPresentation(PresentationProtocol):
                 data = data[element_length:]
                 tpl += (element, )
             return tpl
-
-        raise RuntimeError('Unknown message type')
-    
-
-class Message:
-
-    class Type(Enum):
-        dispatch = 0
-        request = 1
-        respond = 2
-        deny = 3
-        report = 4
-        report_fail = 5
-
-    def __init__(self, type: Type, content = None) -> None:
-        self.type = type
-        self.content = content
+        if data.startswith(b'\x06'): # Message.Type
+            return Message.Type(int.from_bytes(data[1:], 'big'))
+        raise RuntimeError(f'Failed to decode {data}')
 
 
 class TaskDispatchProtocol:
@@ -151,7 +156,7 @@ class TaskDispatchProtocol:
         self.__send(Message.Type.request)
 
     def respond(self, task) -> None:
-        self.__send(Message.Type.respont, task)
+        self.__send(Message.Type.respond, task)
 
     def deny(self) -> None:
         self.__send(Message.Type.deny)
