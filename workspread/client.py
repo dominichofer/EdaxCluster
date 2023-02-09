@@ -32,7 +32,7 @@ class TaskDispatchClient:
     def report_fail(self) -> None:
         self.tdp.report_fail()
 
-    def dispatch(self, tasks) -> list:
+    def dispatch(self, tasks, on_report = lambda *args: None) -> list:
         if not isinstance(tasks, Iterable):
             tasks = [tasks]
 
@@ -45,6 +45,7 @@ class TaskDispatchClient:
             msg = self.tdp.receive()
             if msg.type == Message.Type.report:
                 i, r = msg.content
+                on_report(i, r)
                 results[i] = r
             else:
                 raise RuntimeError('Unexpected message type')

@@ -1,5 +1,8 @@
 from workspread import TaskDispatchClient
 
+def on_report(index: int, result: str):
+    print(index, result)
+
 
 if __name__ == '__main__':
     #ip = sys.argv[1]
@@ -30,5 +33,5 @@ if __name__ == '__main__':
         ('-----------------------O--OOOOO---OOOOOXOOOOXXXX--XXOOXX--XX-O-X X', 60),
         ]
 
-    results = client.dispatch(task)
+    results = client.dispatch(task, on_report)
     print(results)
