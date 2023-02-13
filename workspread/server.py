@@ -24,9 +24,11 @@ class TaskDispatchServer:
 
     def service_client(self, tdp: TaskDispatchProtocol) -> None:
         try:
+            first = True
             while True:
-                msg = tdp.receive(blocking=False)
+                msg = tdp.receive(blocking=first)
                 self.log(f'Received {msg.type.name}.')
+                first = False
 
                 if msg.type == Message.Type.dispatch:
                     if isinstance(msg.content, Iterable):
