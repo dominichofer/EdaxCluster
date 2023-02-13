@@ -1,13 +1,14 @@
 from workspread import TaskDispatchClient
 
+
 def on_report(index: int, result: str):
     print(index, result)
 
 
 if __name__ == '__main__':
     #ip = sys.argv[1]
-    ip = 'ec2-54-157-188-48.compute-1.amazonaws.com'
     ip = 'localhost'
+
     client = TaskDispatchClient(ip)
 
     task = [

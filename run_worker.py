@@ -47,7 +47,6 @@ def work(ip):
 
 if __name__ == '__main__':
     #ip = sys.argv[1]
-    ip = 'ec2-54-157-188-48.compute-1.amazonaws.com'
     ip = 'localhost'
 
     countdown(1)

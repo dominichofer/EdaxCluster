@@ -17,45 +17,49 @@ class TaskDispatchServer:
         Q = len(self.task_queue)
         print(f'[{now}] [Queue size: {Q}] {text}')
 
-    def service_client(self, tdp: TaskDispatchProtocol):
+    def reenlist(self, task, origin) -> None:
+        self.task_queue.insert(0, task)
+        self.origin.insert(0, origin)
+        self.log('Re-enlisted task.')
+
+    def service_client(self, tdp: TaskDispatchProtocol) -> None:
         try:
-            msg = tdp.receive()
-            self.log(f'Received {msg.type.name}.')
-            if msg.type == Message.Type.dispatch:
-                if isinstance(msg.content, Iterable):
-                    self.task_queue.extend(msg.content)
-                    self.origin.extend([tdp] * len(msg.content))
-                else:
-                    self.task_queue.append(msg.content)
-                    self.origin.append(tdp)
-            elif msg.type == Message.Type.request:
-                if self.task_queue:
-                    task = self.task_queue.pop(0)
-                    origin = self.origin.pop(0)
-                    tdp.session.data = (task, origin)
-                    tdp.respond(task)
-                    self.log('Sent task.')
-                else:
-                    tdp.deny()
-                    self.log('Sent no task.')
-            elif msg.type == Message.Type.report:
-                task, origin = tdp.session.data
-                tdp.session.data = None
-                origin.report(msg.content)
-                self.log('Forwarded task.')
-            elif msg.type == Message.Type.report_fail:
-                task, origin = tdp.session.data
-                self.task_queue.insert(0, msg.content)
-                self.origin.insert(0, tdp)
-                self.log('Re-enlisted task.')
-            self.log(f'Processed {msg.type.name}.')
+            while True:
+                msg = tdp.receive(blocking=False)
+                self.log(f'Received {msg.type.name}.')
+
+                if msg.type == Message.Type.dispatch:
+                    if isinstance(msg.content, Iterable):
+                        self.task_queue.extend(msg.content)
+                        self.origin.extend([tdp] * len(msg.content))
+                    else:
+                        self.task_queue.append(msg.content)
+                        self.origin.append(tdp)
+                    self.log('Added tasks.')
+                elif msg.type == Message.Type.request:
+                    if self.task_queue:
+                        task = self.task_queue.pop(0)
+                        origin = self.origin.pop(0)
+                        tdp.session.data = (task, origin)
+                        tdp.respond(task)
+                        self.log('Sent task.')
+                    else:
+                        tdp.deny()
+                        self.log('Sent no task.')
+                elif msg.type == Message.Type.report:
+                    task, origin = tdp.session.data
+                    tdp.session.data = None
+                    origin.report(msg.content)
+                    self.log('Forwarded result.')
+                elif msg.type == Message.Type.report_fail:
+                    self.reenlist(tdp.session.data)
+        except NoDataAvailable:
+            pass
         except Exception as e:
             if tdp.session.data is not None:
-                task, origin = tdp.session.data
-                self.task_queue.insert(0, task)
-                self.origin.insert(0, origin)
+                self.reenlist(tdp.session.data)
             self._conn.unregister(tdp.session.sock)
-            self.log('Connection lost.')
+            self.log(f'Connection lost. Error {e}')
         
     def run(self) -> None:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,6 +74,7 @@ class TaskDispatchServer:
                 if key.data is None:
                     # accept
                     conn, addr = sock.accept()
+                    conn.setblocking(False)
                     tdp = TaskDispatchProtocol(HeaderPresentation, StatefulSession(HeaderSizeTransport), conn)
                     self._conn.register(conn, selectors.EVENT_READ, tdp)
                 else:

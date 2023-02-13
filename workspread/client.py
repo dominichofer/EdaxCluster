@@ -17,7 +17,7 @@ class TaskDispatchClient:
     def request_task(self) -> str:
         try:
             self.tdp.request()
-            msg = self.tdp.receive()
+            msg = self.tdp.receive(blocking = True)
         except:
             return None
         
@@ -42,7 +42,8 @@ class TaskDispatchClient:
         self.tdp.dispatch(tasks)
 
         while any(r is None for r in results):
-            msg = self.tdp.receive()
+            msg = self.tdp.receive(blocking = True)
+
             if msg.type == Message.Type.report:
                 i, r = msg.content
                 on_report(i, r)

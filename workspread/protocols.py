@@ -1,5 +1,6 @@
-from .abstract_protocols import *
+import errno
 from enum import Enum
+from .abstract_protocols import *
     
 
 class Message:
@@ -17,29 +18,54 @@ class Message:
         self.content = content
 
 
+class BrokenConnection(Exception):
+    pass
+
+
+class NoDataAvailable(Exception):
+    pass
+
+
 class HeaderSizeTransport(TransportProtocol):
 
     buffer_size = 2048
+    header_size = 8
+    byteorder = 'big'
 
-    def __init__(self, sock) -> None:
-        self.sock = sock
+    def __init__(self, sock: socket.socket) -> None:
+        self.sock: socket.socket = sock
 
     def send(self, data: bytes) -> None:
-        header = len(data).to_bytes(8, 'big')
+        header = len(data).to_bytes(self.header_size, self.byteorder)
         self.sock.sendall(header + data)
 
-    def receive(self) -> bytes:
-        chunk = self.sock.recv(self.buffer_size)
+    def __try_receive(self, buffer_size) -> bytes:
+        try:
+            chunk = self.sock.recv(buffer_size)
+        except socket.error as e:
+            err = e.args[0]
+            if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+                raise NoDataAvailable()
+            else:
+                raise BrokenConnection()
 
-        header = chunk[0:8]
-        body_size = int.from_bytes(header, 'big')
+        if not chunk:
+            raise BrokenConnection()
+        else:
+            return chunk
 
-        body = bytearray(chunk[8:])
+    def receive(self, blocking: bool) -> bytes:
+        self.sock.setblocking(blocking)
+
+        chunk = self.__try_receive(self.header_size)
+
+        header, body = chunk[:self.header_size], chunk[self.header_size:]
+        body_size = int.from_bytes(header, self.byteorder)
+
+        body = bytearray(body)
         while len(body) < body_size:
-            chunk = self.sock.recv(min(body_size - len(body), self.buffer_size))
-            if chunk == b'':
-                raise RuntimeError('Sock connection broken')
-            body += chunk
+            buffer_size = min(body_size - len(body), self.buffer_size)
+            body += self.__try_receive(buffer_size)
         return body
 
     
@@ -50,7 +76,7 @@ class StatefulSession(SessionProtocol):
         self.data = None
 
     def start(self, sock: socket.socket) -> None:
-        self.sock = sock
+        self.sock: socket.socket = sock
         self.transport = self.transport_protocol(self.sock)
 
     def end(self) -> None:
@@ -59,8 +85,8 @@ class StatefulSession(SessionProtocol):
     def send(self, data: bytes) -> None:
         self.transport.send(data)
 
-    def receive(self) -> bytes:
-        return self.transport.receive()
+    def receive(self, blocking: bool) -> bytes:
+        return self.transport.receive(blocking)
     
     
 class HeaderPresentation(PresentationProtocol):
@@ -144,8 +170,8 @@ class TaskDispatchProtocol:
     def __send(self, msg_type: Message.Type, msg = None):
         self.session.send(self.presentation.encode([msg_type, msg]))
 
-    def receive(self) -> Message:
-        data = self.session.receive()
+    def receive(self, blocking: bool) -> Message:
+        data = self.session.receive(blocking)
         msg = self.presentation.decode(data)
         return Message(*msg)
 
