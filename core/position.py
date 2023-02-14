@@ -1,4 +1,3 @@
-from turtle import pos
 from numpy import uint64
 from .moves import Moves
 import re
