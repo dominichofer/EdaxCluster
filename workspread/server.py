@@ -54,7 +54,7 @@ class TaskDispatchServer:
                     origin.report(msg.content)
                     self.log('Forwarded result.')
                 elif msg.type == Message.Type.report_fail:
-                    self.reenlist(tdp.session.data)
+                    self.reenlist(*tdp.session.data)
         except NoDataAvailable:
             pass
         except Exception as e:
