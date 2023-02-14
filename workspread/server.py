@@ -59,7 +59,7 @@ class TaskDispatchServer:
             pass
         except Exception as e:
             if tdp.session.data is not None:
-                self.reenlist(tdp.session.data)
+                self.reenlist(*tdp.session.data)
             self._conn.unregister(tdp.session.sock)
             self.log(f'Connection lost. Error {e}')
         
