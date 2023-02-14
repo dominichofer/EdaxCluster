@@ -28,7 +28,7 @@ def work(ip):
         pos = Position.from_string(pos)
         depth = int(depth)
 
-        engine = edax.Engine('../edax-reversi/bin/lEdax-x64-modern', depth)
+        engine = edax.Engine('/home/ubuntu/edax-reversi/bin/lEdax-x64-modern', depth)
         #engine = edax.Engine(r'G:\edax-ms-windows\edax-4.4', depth)
 
         line = engine.solve(pos)[0]
