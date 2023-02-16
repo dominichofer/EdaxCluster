@@ -12,7 +12,7 @@ def log(text: str = ''):
     print(f'[{now}] {text}')
 
 
-def work(ip):
+def work(ip, edax_exe):
     client = TaskDispatchClient(ip)
 
     while True:
@@ -28,9 +28,7 @@ def work(ip):
         pos = Position.from_string(pos)
         depth = int(depth)
 
-        engine = edax.Engine('/home/ubuntu/edax-reversi/bin/lEdax-x64-modern', depth)
-        #engine = edax.Engine(r'G:\edax-ms-windows\edax-4.4', depth)
-
+        engine = edax.Engine(edax_exe, depth)
         line = engine.solve(pos)[0]
 
         result = f'{line.depth} {line.confidence} {line.score} {line.time} {line.nodes}'
@@ -39,11 +37,12 @@ def work(ip):
 
 
 if __name__ == '__main__':
-    ip = sys.argv[1]
+    edax_exe = sys.argv[1]
+    ip = sys.argv[2]
 
     threads = []
     for _ in range(multiprocessing.cpu_count()):
-        threads.append(threading.Thread(target=work, args=(ip,)))
+        threads.append(threading.Thread(target=work, args=(ip, edax_exe)))
 
     for t in threads:
         t.start()
