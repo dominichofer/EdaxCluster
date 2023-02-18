@@ -2,6 +2,7 @@ import subprocess
 import secrets
 import numpy as np
 import multiprocessing
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
 from typing import Iterable
 from core import write_position_file
@@ -32,13 +33,14 @@ class Engine:
             
     def solve(self, pos) -> list[Line]:
         if not isinstance(pos, Iterable):
-            return self.__solve(pos)
+            pos = [pos]
         
-        with multiprocessing.Pool() as pool:
-            results = pool.map(
-                self.__solve, 
-                np.array_split(pos, multiprocessing.cpu_count() * 4)
-                )
+        pool = ThreadPool()
+        results = pool.map(
+            self.__solve, 
+            np.array_split(pos, multiprocessing.cpu_count() * 4)
+            )
+        pool.close()
         return [r for result in results for r in result]
 
     def choose_move(self, pos) -> list[int]:
