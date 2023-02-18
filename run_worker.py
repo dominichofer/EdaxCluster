@@ -30,10 +30,9 @@ def work(ip, edax_exe):
 
         engine = edax.Engine(edax_exe, depth)
         line = engine.solve(pos)[0]
-
-        result = f'{line.depth} {line.confidence} {line.score} {line.time} {line.nodes}'
-        client.report_result((index, result))
-        log(f'Sent result: {result}')
+        
+        client.report_result((index, (line.depth, line.score, line.time, line.nodes)))
+        log(f'Sent result: {line.depth} {line.score} {line.time} {line.nodes}')
 
 
 if __name__ == '__main__':
