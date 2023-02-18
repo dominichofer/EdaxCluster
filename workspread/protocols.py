@@ -30,13 +30,12 @@ class HeaderSizeTransport(TransportProtocol):
 
     buffer_size = 2048
     header_size = 8
-    byteorder = 'big'
 
     def __init__(self, sock: socket.socket) -> None:
         self.sock: socket.socket = sock
 
     def send(self, data: bytes) -> None:
-        header = len(data).to_bytes(self.header_size, self.byteorder)
+        header = len(data).to_bytes(self.header_size, 'big', signed=True)
         self.sock.sendall(header + data)
 
     def __try_receive(self, buffer_size) -> bytes:
@@ -60,7 +59,7 @@ class HeaderSizeTransport(TransportProtocol):
         chunk = self.__try_receive(self.header_size)
 
         header, body = chunk[:self.header_size], chunk[self.header_size:]
-        body_size = int.from_bytes(header, self.byteorder)
+        body_size = int.from_bytes(header, 'big', signed=True)
 
         body = bytearray(body)
         while len(body) < body_size:
@@ -98,7 +97,7 @@ class HeaderPresentation(PresentationProtocol):
         if isinstance(msg, bytes):
             return b'\x01' + msg
         if isinstance(msg, int):
-            return b'\x02' + msg.to_bytes(8, 'big')
+            return b'\x02' + msg.to_bytes(8, 'big', signed=True)
         if isinstance(msg, str):
             return b'\x03' + msg.encode('utf8')
         if isinstance(msg, list):
@@ -128,7 +127,7 @@ class HeaderPresentation(PresentationProtocol):
         if data.startswith(b'\x01'): # bytes
             return data[1:]
         if data.startswith(b'\x02'): # int
-            return int.from_bytes(data[1:], 'big')
+            return int.from_bytes(data[1:], 'big', signed=True)
         if data.startswith(b'\x03'): # str
             return data[1:].decode('utf8')
         if data.startswith(b'\x04'): # list
