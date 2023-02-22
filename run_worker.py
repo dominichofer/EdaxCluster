@@ -1,6 +1,5 @@
 import datetime
 import multiprocessing
-import subprocess
 import sys
 import threading
 import edax
@@ -28,7 +27,7 @@ def work(ip, edax_exe):
         pos = Position.from_string(pos)
         depth = int(depth)
 
-        engine = edax.Engine(edax_exe, depth)
+        engine = edax.Engine(edax_exe, depth, tasks=1)
         line = engine.solve(pos)[0]
         
         client.report_result((index, (line.depth, line.score, line.time, line.nodes)))
@@ -36,11 +35,11 @@ def work(ip, edax_exe):
 
 
 if __name__ == '__main__':
-    #edax_exe = sys.argv[1]
-    #ip = sys.argv[2]
-    edax_exe = r'G:\edax-ms-windows\edax-4.4'
-    ip = 'ec2-44-195-46-122.compute-1.amazonaws.com'
-    ip = 'localhost'
+    edax_exe = sys.argv[1]
+    ip = sys.argv[2]
+    #edax_exe = r'G:\edax-ms-windows\edax-4.4'
+    #ip = 'ec2-44-195-46-122.compute-1.amazonaws.com'
+    #ip = 'localhost'
 
     #work(ip, edax_exe)
 
@@ -53,5 +52,3 @@ if __name__ == '__main__':
 
     for t in threads:
         t.join()
-
-    #subprocess.run(['shutdown', 'now'])
