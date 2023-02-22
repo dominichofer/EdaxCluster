@@ -15,9 +15,10 @@ class TaskDispatchServer:
     def log(self, text: str) -> None:
         now = datetime.datetime.now()
         Q = len(self.task_queue)
-        print(f'[{now}] [Queue size: {Q}] {text}')
+        W = len(self._conn.get_map()) - 1
+        print(f'[{now}] [Q: {Q}, W: {W}] {text}')
 
-    def reenlist(self, task, origin) -> None:
+    def re_enlist(self, task, origin) -> None:
         self.task_queue.insert(0, task)
         self.origin.insert(0, origin)
         self.log('Re-enlisted task.')
@@ -27,8 +28,8 @@ class TaskDispatchServer:
             first = True
             while True:
                 msg = tdp.receive(blocking=first)
-                self.log(f'Received {msg.type.name}.')
                 first = False
+                self.log(f'Received {msg.type.name}.')
 
                 if msg.type == Message.Type.dispatch:
                     if isinstance(msg.content, Iterable):
@@ -54,30 +55,27 @@ class TaskDispatchServer:
                     origin.report(msg.content)
                     self.log('Forwarded result.')
                 elif msg.type == Message.Type.report_fail:
-                    self.reenlist(*tdp.session.data)
+                    self.re_enlist(*tdp.session.data)
         except NoDataAvailable:
             pass
         except Exception as e:
             if tdp.session.data is not None:
-                self.reenlist(*tdp.session.data)
-            self._conn.unregister(tdp.session.sock)
+                self.re_enlist(*tdp.session.data)
+            self._conn.unregister(tdp.session.transporter.sock)
             self.log(f'Connection lost. Error {e}')
         
     def run(self) -> None:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('', 12350))
-        sock.listen()
-        self._conn.register(sock, selectors.EVENT_READ, None)
+        connector = Connector()
+        connector.listen(port = 12350)
+        self._conn.register(connector.sock, selectors.EVENT_READ, connector)
         self.log('Server running...')
 
         while True:
             for key, _ in self._conn.select():
                 sock = key.fileobj
-                if key.data is None:
-                    # accept
-                    conn, addr = sock.accept()
-                    conn.setblocking(False)
-                    tdp = TaskDispatchProtocol(HeaderPresentation, StatefulSession(HeaderSizeTransport), conn)
-                    self._conn.register(conn, selectors.EVENT_READ, tdp)
+                if isinstance(key.data, Connector):
+                    transporter = key.data.accept()
+                    tdp = TaskDispatchProtocol(PascalMethod(), StatefulSession(transporter))
+                    self._conn.register(transporter.sock, selectors.EVENT_READ, tdp)
                 else:
                     self.service_client(key.data)

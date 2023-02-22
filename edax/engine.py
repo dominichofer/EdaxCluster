@@ -10,38 +10,51 @@ from .output import Line, parse
 
 
 class Engine:
-    def __init__(self, exe_path, level: int):
-        self.level: int = level
+    def __init__(self, exe_path, level: int, tasks: int = None, thread_pool: bool = False):
         self.exe: Path = Path(exe_path)
+        self.level: int = level
+        self.tasks: int = tasks
+        self.thread_pool: bool = thread_pool
 
-    def name(self, separator: str = ' '):
-        return separator.join(['Edax4.4', 'level', str(self.level)])
+    def name(self):
+        return f'Edax4.4 level {self.level}'
 
-    def __solve(self, pos) -> Line:
-        tmp_file = self.exe.parent / f'temp_{secrets.token_hex(16)}.script'
-        write_position_file(pos, tmp_file) # create temp file
-        cmd = [self.exe, '-n', '1', '-l', str(self.level), '-solve', tmp_file]
+    def __solve(self, pos) -> list[Line]:
+        token = secrets.token_hex(16)
+        tmp_file = self.exe.parent / f'tmp_{token}.script'
+
+        write_position_file(pos, tmp_file) # create tmp file
+        
+        cmd = [self.exe, '-l', str(self.level), '-solve', tmp_file]
+        if self.tasks:
+            cmd += ['-n', str(self.tasks)]
         if self.level < 2:
             cmd += ['-h', '10']
+
         result = subprocess.run(
             cmd,
             cwd = self.exe.parent,
             capture_output = True,
             text = True)
-        tmp_file.unlink() # remove temp file
+
+        tmp_file.unlink() # remove tmp file
+
         return parse(result.stdout)
             
     def solve(self, pos) -> list[Line]:
         if not isinstance(pos, Iterable):
             pos = [pos]
         
-        pool = ThreadPool()
-        results = pool.map(
-            self.__solve, 
-            np.array_split(pos, multiprocessing.cpu_count() * 4)
-            )
-        pool.close()
-        return [r for result in results for r in result]
+        if self.thread_pool:
+            pool = ThreadPool()
+            results = pool.map(
+                self.__solve, 
+                np.array_split(pos, multiprocessing.cpu_count() * 4)
+                )
+            pool.close()
+            return [r for result in results for r in result]
+        else:
+            return self.__solve(pos)
 
     def choose_move(self, pos) -> list[int]:
         result = self.solve(pos)

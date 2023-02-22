@@ -9,10 +9,8 @@ def log(text: str) -> None:
 class TaskDispatchClient:
 
     def __init__(self, ip) -> None:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((ip, 12350))
-        sock.setblocking(True)
-        self.tdp = TaskDispatchProtocol(HeaderPresentation, StatefulSession(HeaderSizeTransport), sock)
+        transporter = Connector().connect(ip, port = 12350)
+        self.tdp = TaskDispatchProtocol(PascalMethod(), StatefulSession(transporter))
 
     def request_task(self) -> str:
         try:

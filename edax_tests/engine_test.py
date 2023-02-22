@@ -1,6 +1,6 @@
 import unittest
 from core import Position
-from edax import Engine, Line
+from edax import Engine
 
 edax_binary = r'G:\edax-ms-windows\edax-4.4'
 

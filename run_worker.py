@@ -5,7 +5,7 @@ import sys
 import threading
 import edax
 from core import Position
-from workspread import TaskDispatchClient
+from cluster import TaskDispatchClient
 
 def log(text: str = ''):
     now = datetime.datetime.now()
@@ -36,8 +36,13 @@ def work(ip, edax_exe):
 
 
 if __name__ == '__main__':
-    edax_exe = sys.argv[1]
-    ip = sys.argv[2]
+    #edax_exe = sys.argv[1]
+    #ip = sys.argv[2]
+    edax_exe = r'G:\edax-ms-windows\edax-4.4'
+    ip = 'ec2-44-195-46-122.compute-1.amazonaws.com'
+    ip = 'localhost'
+
+    #work(ip, edax_exe)
 
     threads = []
     for _ in range(multiprocessing.cpu_count()):
@@ -49,4 +54,4 @@ if __name__ == '__main__':
     for t in threads:
         t.join()
 
-    subprocess.run(['shutdown', 'now'])
+    #subprocess.run(['shutdown', 'now'])

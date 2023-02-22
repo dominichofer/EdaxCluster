@@ -16,6 +16,7 @@
     <UnitTestPattern>*_test.py</UnitTestPattern>
     <UnitTestRootDirectory>.</UnitTestRootDirectory>
     <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,10 +35,10 @@
     <Folder Include="edax\__pycache__\" />
     <Folder Include="edax_tests\" />
     <Folder Include="edax_tests\__pycache__\" />
-    <Folder Include="workspread\" />
-    <Folder Include="workspread\__pycache__\" />
-    <Folder Include="workspread\test\" />
-    <Folder Include="workspread\test\__pycache__\" />
+    <Folder Include="cluster\" />
+    <Folder Include="cluster\__pycache__\" />
+    <Folder Include="cluster_test\" />
+    <Folder Include="cluster_test\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="core\__pycache__\field.cpython-310.pyc" />
@@ -59,19 +60,19 @@
     <Content Include="edax\__pycache__\output.cpython-310.pyc" />
     <Content Include="edax\__pycache__\__init__.cpython-310.pyc" />
     <Content Include="edax_tests\__pycache__\__init__.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\abstract_protocols.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\client.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\job.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\job.cpython-38.pyc" />
-    <Content Include="workspread\__pycache__\message.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\message.cpython-38.pyc" />
-    <Content Include="workspread\__pycache__\protocols.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\server.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\server.cpython-38.pyc" />
-    <Content Include="workspread\__pycache__\__init__.cpython-310.pyc" />
-    <Content Include="workspread\__pycache__\__init__.cpython-38.pyc" />
-    <Content Include="workspread\test\__pycache__\test_message.cpython-310.pyc" />
-    <Content Include="workspread\test\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\abstract_protocols.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\client.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\job.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\job.cpython-38.pyc" />
+    <Content Include="cluster\__pycache__\message.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\message.cpython-38.pyc" />
+    <Content Include="cluster\__pycache__\protocols.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\server.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\server.cpython-38.pyc" />
+    <Content Include="cluster\__pycache__\__init__.cpython-310.pyc" />
+    <Content Include="cluster\__pycache__\__init__.cpython-38.pyc" />
+    <Content Include="cluster_test\__pycache__\test_message.cpython-310.pyc" />
+    <Content Include="cluster_test\__pycache__\__init__.cpython-310.pyc" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="core\field.py" />
@@ -104,15 +105,24 @@
     <Compile Include="run_sender.py" />
     <Compile Include="run_server.py" />
     <Compile Include="run_worker.py" />
-    <Compile Include="workspread\abstract_protocols.py" />
-    <Compile Include="workspread\client.py" />
-    <Compile Include="workspread\job.py" />
-    <Compile Include="workspread\message.py" />
-    <Compile Include="workspread\protocols.py" />
-    <Compile Include="workspread\server.py" />
-    <Compile Include="workspread\__init__.py" />
-    <Compile Include="workspread\test\protocols_test.py" />
-    <Compile Include="workspread\test\__init__.py" />
+    <Compile Include="cluster\abstract_protocols.py" />
+    <Compile Include="cluster\client.py" />
+    <Compile Include="cluster\protocols.py" />
+    <Compile Include="cluster\server.py" />
+    <Compile Include="cluster\__init__.py" />
+    <Compile Include="cluster_test\protocols_test.py" />
+    <Compile Include="cluster_test\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="env\">
+      <Id>env</Id>
+      <Version>3.10</Version>
+      <Description>env (Python 3.10 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

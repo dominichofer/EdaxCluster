@@ -1,38 +1,66 @@
-from workspread import TaskDispatchClient
+from cluster import TaskDispatchClient
+from core import parse_game_score_file, write_game_score_file, undefined_score, solve_game_score_file
+import edax
 
-
-def on_report(index: int, result: str):
+def on_report(index: int, result):
     print(index, result)
 
 
 if __name__ == '__main__':
+    #pos = [0] * 64
+    #solved = [0] * 64
+    files = [
+        r'G:\Edax4.4_level_0_vs_Edax4.4_level_0_from_e54.gs',
+        r'G:\Edax4.4_level_5_vs_Edax4.4_level_5_from_e54.gs',
+        r'G:\Edax4.4_level_10_vs_Edax4.4_level_10_from_e54.gs',
+        r'G:\Edax4.4_level_15_vs_Edax4.4_level_15_from_e54.gs',
+        r'G:\Edax4.4_level_20_vs_Edax4.4_level_20_from_e54.gs',
+    ]
+
     #ip = sys.argv[1]
-    ip = 'localhost'
+    #ip = 'ec2-44-195-46-122.compute-1.amazonaws.com'
+    client = TaskDispatchClient('localhost')
 
-    client = TaskDispatchClient(ip)
+    engine = edax.Engine(r'G:\edax-ms-windows\edax-4.4', 60)
+    
+    tasks = []
+    for file_index, f in enumerate(files):
+        game_scores = parse_game_score_file(f)
+    #    for game_index, gs in enumerate(game_scores):
+    #        for pos_index, pos in enumerate(gs.positions()):
+    #            if pos.empty_count() <= 29 and gs.scores[pos_index] == undefined_score:
+    #                line = engine.solve(pos)[0]
+    #                print(line)
+    #                gs.scores[pos_index] = line.score
+    #    write_game_score_file(game_scores, f)
+        tasks += [
+            (pos, file_index, game_index, pos_index)
+            for game_index, gs in enumerate(game_scores)
+            for pos_index, pos in enumerate(gs.positions())
+            if pos.empty_count() <= 30 and gs.scores[pos_index] == undefined_score
+            ]
+        
+    results = client.dispatch([(str(t[0]), 60) for t in tasks], on_report)
+    
+    #for file_index, f in enumerate(files):
+    #    game_scores = parse_game_score_file(f)
 
-    task = [
-        ('O--OOOOX-OOOOOOXOOXXOOOXOOXOOOXXOOOOOOXX---OOOOX----O--X-------- X', 60),
-        ('-OOOOO----OOOOX--OOOOOO-XXXXXOO--XXOOX--OOXOXX----OXXO---OOO--O- X', 60),
-        ('--OOO-------XX-OOOOOOXOO-OOOOXOOX-OOOXXO---OOXOO---OOOXO--OOOO-- X', 60),
-        ('--XXXXX---XXXX---OOOXX---OOXXXX--OOXXXO-OOOOXOO----XOX----XXXXX- O', 60),
-        ('--O-X-O---O-XO-O-OOXXXOOOOOOXXXOOOOOXX--XXOOXO----XXXX-----XXX-- O', 60),
-        ('---XXXX-X-XXXO--XXOXOO--XXXOXO--XXOXXO---OXXXOO-O-OOOO------OO-- X', 60),
-        ('---XXX----OOOX----OOOXX--OOOOXXX--OOOOXX--OXOXXX--XXOO---XXXX-O- X', 60),
-        ('-OOOOO----OOOO---OOOOX--XXXXXX---OXOOX--OOOXOX----OOXX----XXXX-- O', 60),
-        ('-----X--X-XXX---XXXXOO--XOXOOXX-XOOXXX--XOOXX-----OOOX---XXXXXX- O', 60),
-        ('--OX-O----XXOO--OOOOOXX-OOOOOX--OOOXOXX-OOOOXX-----OOX----X-O--- X', 60),
-        ('----X-----XXX----OOOXOOO-OOOXOOO-OXOXOXO-OOXXOOO--OOXO----O--O-- X', 60),
-        ('----O-X------X-----XXXO-OXXXXXOO-XXOOXOOXXOXXXOO--OOOO-O----OO-- O', 60),
-        ('---X-------OX--X--XOOXXXXXXOXXXXXXXOOXXXXXXOOOXX--XO---X-------- O', 60),
-        ('----OO-----OOO---XXXXOOO--XXOOXO-XXXXXOO--OOOXOO--X-OX-O-----X-- X', 60),
-        ('--OOO---XXOO----XXXXOOOOXXXXOX--XXXOXX--XXOOO------OOO-----O---- X', 60),
-        ('--------X-X------XXXXOOOOOXOXX--OOOXXXX-OOXXXX--O-OOOX-----OO--- O', 60),
-        ('--XXXXX---XXXX---OOOXX---OOXOX---OXXXXX-OOOOOXO----OXX---------- O', 60),
-        ('-------------------XXOOO--XXXOOO--XXOXOO-OOOXXXO--OXOO-O-OOOOO-- X', 60),
-        ('--XOOO----OOO----OOOXOO--OOOOXO--OXOXXX-OOXXXX----X-XX---------- X', 60),
-        ('-----------------------O--OOOOO---OOOOOXOOOOXXXX--XXOOXX--XX-O-X X', 60),
-        ]
+    #    for t, r in zip(tasks, results):
+    #        if t[1] == file_index:
+    #            game_scores[t[2]].scores[t[3]] = r[1]
 
-    results = client.dispatch(task, on_report)
-    print(results)
+    #    write_game_score_file(game_scores, f)
+
+        #game_scores = parse_game_score_file(f)
+        #for gs in game_scores:
+        #    for p, s in gs.pos_scores():
+        #        pos[p.empty_count()] += 1
+        #        if s == undefined_score and p.empty_count() <= 28:
+        #            print(p)
+                #if p.empty_count() == 10:
+                #    pos.append((str(p), 10))
+    #print(pos)
+    #print(solved)
+    
+    #results = client.dispatch(task, on_report)
+    #print(results)

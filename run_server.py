@@ -1,4 +1,4 @@
-from workspread import TaskDispatchServer
+from cluster import TaskDispatchServer
 
 
 if __name__ == '__main__':
