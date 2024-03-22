@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools >= 64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edax_cluster"
+version = "0.0.0"
+dependencies = [
+    "rte @ git+https://github.com/dominichofer/RemoteTaskExecution",
+    "reversi @ git+https://github.com/dominichofer/python-reversi",
+    "pytest",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pylint]
+disable = [
+    "C0114",  # Missing module docstring
+    "C0115",  # Missing class docstring
+    "C0116",  # Missing function or method docstring
+]
