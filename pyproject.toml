@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "edax_cluster"
 version = "0.0.0"
+requires-python = ">= 3.10"
 dependencies = [
     "rte @ git+https://github.com/dominichofer/RemoteTaskExecution",
     "reversi @ git+https://github.com/dominichofer/python-reversi",
