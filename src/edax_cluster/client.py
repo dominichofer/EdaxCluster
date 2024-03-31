@@ -11,4 +11,4 @@ class EdaxBatchClient:
     def solve(self, tasks: list[EdaxTask]) -> list[Optional[EdaxLine]]:
         task_bytes = [bytes(task) for task in tasks]
         results = self.client.solve(task_bytes)
-        return [EdaxLine(r.decode()) if r is not None else None for r in results]
+        return [EdaxLine.from_bytes(r) if r is not None else None for r in results]

@@ -1,7 +1,7 @@
 import logging
 from rte import Server, GrpcServer
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
     server = Server(task_timeout=10)
