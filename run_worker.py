@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 def work(target):
     server = RemoteServer(target)
-    worker = EdaxWorker(server, refresh_time=1)
+    worker = EdaxWorker(server, refresh_time=10)
     worker.run()
 
 

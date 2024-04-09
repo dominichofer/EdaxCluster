@@ -13,7 +13,7 @@ if __name__ == "__main__":
     print(len(unsolved_pos))
 
     server = RemoteServer("localhost:50051")
-    client = EdaxBatchClient(server, refresh_time=0.1)
+    client = EdaxBatchClient(server, refresh_time=10)
     tasks = [EdaxTask(pos, level=60) for pos in unsolved_pos]
     results = client.solve(tasks)
 
