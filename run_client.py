@@ -16,12 +16,11 @@ if __name__ == "__main__":
     print(len(unsolved_pos))
 
     server = RemoteServer(f"{ip}:50051")
-    client = EdaxBatchClient(server, refresh_time=10)
+    client = EdaxBatchClient(server, refresh_time=0.01, attempts=100)
     tasks = [EdaxTask(pos, level=60) for pos in unsolved_pos]
     results = client.solve(tasks)
 
-    scores = [r.score for r in results if r is not None]
-    pos_score = dict(zip(unsolved_pos, scores))
+    pos_score = {pos: r.score for pos, r in zip(unsolved_pos, results) if r is not None}
 
     # Update the scores
     for sg in scored_games:

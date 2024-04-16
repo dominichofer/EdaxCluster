@@ -5,8 +5,8 @@ from .task import EdaxTask
 
 
 class EdaxBatchClient:
-    def __init__(self, server, refresh_time) -> None:
-        self.client = BatchClient(server, refresh_time)
+    def __init__(self, server, refresh_time, attempts: int = 1) -> None:
+        self.client = BatchClient(server, refresh_time, attempts)
 
     def solve(self, tasks: list[EdaxTask]) -> list[Optional[EdaxLine]]:
         task_bytes = [bytes(task) for task in tasks]
