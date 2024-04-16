@@ -7,10 +7,12 @@ from edax_cluster import EdaxBatchClient, EdaxTask
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
-    ip = sys.argv[1] if len(sys.argv) > 1 else "localhost"
+    file = sys.argv[1]
+    ip = sys.argv[2] if len(sys.argv) > 1 else "localhost"
+    lower_empty_count = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+    upper_empty_count = int(sys.argv[4]) if len(sys.argv) > 4 else 64
 
-    FILE = r"C:\Users\Dominic\source\repos\python-reversi\data\random_selfplay_from_e54.gs"
-    scored_games: list[ScoredGame] = read_file(FILE)
+    scored_games: list[ScoredGame] = read_file(file)
     scored_pos = empty_count_range_filtered(scored_positions(scored_games), 0, 30)
     unsolved_pos = [sp.pos for sp in scored_pos if not sp.is_score_defined()]
     print(len(unsolved_pos))
@@ -28,4 +30,4 @@ if __name__ == "__main__":
             if pos in pos_score:
                 sg.scores[i] = pos_score[pos]
 
-    write_file(FILE, scored_games)
+    write_file(file, scored_games)
